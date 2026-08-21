@@ -1160,11 +1160,21 @@ elif page == "🗄️ SQL Insights":
                         st.info("MySQL is offline. Executing simulated SQL query on in-memory dataset...")
                         # Run query against local dataframe table simulation
                         import sqlite3
+                        import re
                         conn_mem = sqlite3.connect(":memory:")
                         df_raw.to_sql("performance_all", conn_mem, index=False)
-                        # Extract table query replacement for simulation
-                        sim_sql = user_sql.replace("students s JOIN performance p ON s.student_id = p.student_id", "performance_all")
-                        sim_sql = sim_sql.replace("students", "performance_all").replace("performance", "performance_all")
+                        # Replace JOIN syntax first, then standalone table names
+                        # Use word boundaries to avoid double-replacing "performance_all"
+                        sim_sql = user_sql.replace(
+                            "students s JOIN performance p ON s.student_id = p.student_id",
+                            "performance_all"
+                        )
+                        # Replace standalone "students" and "performance" (not already "performance_all")
+                        sim_sql = re.sub(r'\bstudents\b', 'performance_all', sim_sql)
+                        sim_sql = re.sub(r'\bperformance\b(?!_all)', 'performance_all', sim_sql)
+                        # Fix any aliases like "s." or "p." -> remove them
+                        sim_sql = re.sub(r'\bs\.', '', sim_sql)
+                        sim_sql = re.sub(r'\bp\.', '', sim_sql)
 
                         res_df = pd.read_sql(sim_sql, conn_mem)
                         st.success("Query executed successfully on simulated dataset!")
