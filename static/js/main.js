@@ -18,6 +18,195 @@ document.addEventListener("DOMContentLoaded", () => {
     const pageTitle = document.getElementById("pageTitle");
     const pageSubtitle = document.getElementById("pageSubtitle");
 
+    // ==========================================
+    // DASHBOARD OPEN / CLOSE TOGGLE
+    // ==========================================
+
+    const dashboardSection =
+        document.getElementById("tab-dashboard");
+
+    if (dashboardSection) {
+
+        const header =
+            document.querySelector("header");
+
+        if (
+            header &&
+            !document.getElementById("dashboardToggleBtn")
+        ) {
+
+            const headerActions =
+                header.querySelector(
+                    ".flex.items-center.gap-3"
+                );
+
+            if (headerActions) {
+
+                const dashboardToggleBtn =
+                    document.createElement("button");
+
+                dashboardToggleBtn.id =
+                    "dashboardToggleBtn";
+
+                dashboardToggleBtn.type =
+                    "button";
+
+                dashboardToggleBtn.className =
+                    "flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-300 text-xs font-bold hover:bg-brand-500/20 transition-all";
+
+                dashboardToggleBtn.innerHTML = `
+                <i
+                    id="dashboardToggleIcon"
+                    class="fa-solid fa-eye-slash"
+                ></i>
+
+                <span
+                    id="dashboardToggleText"
+                >
+                    Close Dashboard
+                </span>
+            `;
+
+                headerActions.insertBefore(
+                    dashboardToggleBtn,
+                    headerActions.firstElementChild
+                );
+
+
+                // ==================================
+                // BUTTON CLICK
+                // ==================================
+
+                dashboardToggleBtn.addEventListener(
+                    "click",
+                    function () {
+
+                        const isHidden =
+                            dashboardSection.classList.contains(
+                                "hidden"
+                            );
+
+
+                        // ==============================
+                        // OPEN DASHBOARD
+                        // ==============================
+
+                        if (isHidden) {
+
+                            dashboardSection.classList.remove(
+                                "hidden"
+                            );
+
+                            dashboardSection.classList.add(
+                                "block"
+                            );
+
+
+                            // Activate Dashboard navigation
+
+                            navButtons.forEach(
+                                function (button) {
+
+                                    button.classList.remove(
+                                        "active"
+                                    );
+
+                                    button.classList.add(
+                                        "text-slate-400"
+                                    );
+
+                                }
+                            );
+
+
+                            const dashboardNavButton =
+                                document.querySelector(
+                                    '.nav-btn[data-tab="dashboard"]'
+                                );
+
+
+                            if (dashboardNavButton) {
+
+                                dashboardNavButton.classList.add(
+                                    "active"
+                                );
+
+                                dashboardNavButton.classList.remove(
+                                    "text-slate-400"
+                                );
+
+                            }
+
+
+                            // Update page title
+
+                            if (
+                                pageTitle &&
+                                tabMetaData.dashboard
+                            ) {
+
+                                pageTitle.textContent =
+                                    tabMetaData.dashboard.title;
+
+                                pageSubtitle.textContent =
+                                    tabMetaData.dashboard.subtitle;
+
+                            }
+
+
+                            // Update button
+
+                            document.getElementById(
+                                "dashboardToggleText"
+                            ).textContent =
+                                "Close Dashboard";
+
+
+                            document.getElementById(
+                                "dashboardToggleIcon"
+                            ).className =
+                                "fa-solid fa-eye-slash";
+
+                        }
+
+
+                        // ==============================
+                        // CLOSE DASHBOARD
+                        // ==============================
+
+                        else {
+
+                            dashboardSection.classList.remove(
+                                "block"
+                            );
+
+                            dashboardSection.classList.add(
+                                "hidden"
+                            );
+
+
+                            document.getElementById(
+                                "dashboardToggleText"
+                            ).textContent =
+                                "Open Dashboard";
+
+
+                            document.getElementById(
+                                "dashboardToggleIcon"
+                            ).className =
+                                "fa-solid fa-eye";
+
+                        }
+
+                    }
+                );
+
+            }
+
+        }
+
+    }
+
     // Global Filter Elements
     const filterCity = document.getElementById("filterCity");
     const filterGenderGroup = document.getElementById("filterGenderGroup");
