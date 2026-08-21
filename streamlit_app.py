@@ -64,7 +64,7 @@ st.markdown(
     /* Hide standard header & footer */
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
-    header { visibility: hidden; }
+    
 
     /* Sidebar Styling */
     section[data-testid="stSidebar"] {
