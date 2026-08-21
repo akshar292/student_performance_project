@@ -12,11 +12,17 @@
 
 ## 🌐 Live Demo
 
-🚀 **[Open StudentIQ Live Application](https://studentperformanceprojectgit-6cncbxbzdp58y8oba3y2f5.streamlit.app/)**
+🚀 **[Open StudentIQ Live Application](https://studentperformanceproject-vgaqge3bhcppxt3afuahvy.streamlit.app/)**
 
 ---
 
-## 📌 Overview
+## 📂 GitHub Repository
+
+🔗 **[View Source Code on GitHub](https://github.com/akshar292/student_performance_project)**
+
+---
+
+# 📌 Overview
 
 StudentIQ is an end-to-end **Student Performance Analytics and Prediction Platform** designed to analyze student academic performance and generate Machine Learning based predictions.
 
@@ -32,7 +38,7 @@ The platform combines:
 - Batch CSV prediction
 - Academic recommendations
 
-The system uses the following academic factors:
+The system analyzes the following academic factors:
 
 - Attendance
 - Study Hours
@@ -55,7 +61,7 @@ Based on these features, StudentIQ provides:
 
 ## 🏠 Dashboard
 
-The Dashboard provides an overall view of student performance.
+The Dashboard provides an overall view of student academic performance.
 
 ### Includes:
 
@@ -71,7 +77,7 @@ The Dashboard provides an overall view of student performance.
 
 ## 📊 Analytics
 
-The Analytics section provides detailed insights into academic performance.
+The Analytics section provides detailed insights into student performance.
 
 ### Analysis includes:
 
@@ -90,7 +96,7 @@ The Analytics section provides detailed insights into academic performance.
 
 The AI Prediction module uses Machine Learning models to predict student performance.
 
-### Input Features:
+### Input Features
 
 - Attendance
 - Study Hours
@@ -98,7 +104,7 @@ The AI Prediction module uses Machine Learning models to predict student perform
 - Midterm Score
 - Previous Score
 
-### Outputs:
+### Outputs
 
 - Predicted Final Score
 - PASS / FAIL Prediction
@@ -110,15 +116,15 @@ The AI Prediction module uses Machine Learning models to predict student perform
 
 ## 🔍 Student Directory
 
-The Student Directory allows users to search and analyze student records.
+The Student Directory allows users to search and analyze individual student records.
 
-### Search options:
+### Search Options
 
 - Student ID
 - Student Name
 - City
 
-Users can view individual student information and performance details.
+Users can view individual student information and academic performance.
 
 ---
 
@@ -126,7 +132,7 @@ Users can view individual student information and performance details.
 
 The SQL Insights section provides database-level analytics.
 
-### Available analysis:
+### Available Analysis
 
 - Total Students
 - Average Final Score
@@ -143,7 +149,7 @@ The SQL Insights section provides database-level analytics.
 
 Users can upload a CSV file containing multiple student records.
 
-### Required CSV columns:
+### Required CSV Columns
 
 ```text
 attendance
