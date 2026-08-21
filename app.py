@@ -428,10 +428,11 @@ def execute_sql():
 
 
 if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
     try:
         from waitress import serve
-        print("Serving StudentIQ Production WSGI Server (Waitress) on http://127.0.0.1:5000")
-        serve(app, host="127.0.0.1", port=5000)
+        print(f"Serving StudentIQ Production WSGI Server (Waitress) on http://0.0.0.0:{port}")
+        serve(app, host="0.0.0.0", port=port)
     except ImportError:
-        print("Starting StudentIQ Flask Web Server on http://127.0.0.1:5000")
-        app.run(host="127.0.0.1", port=5000, debug=False, use_reloader=False)
+        print(f"Starting StudentIQ Flask Web Server on http://0.0.0.0:{port}")
+        app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
