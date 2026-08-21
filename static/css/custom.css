@@ -1,0 +1,84 @@
+/* Custom CSS System for StudentIQ Dark Glassmorphism */
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #070a13;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* Glassmorphism Container */
+.glass-card {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+/* Navigation Button Styling */
+.nav-btn.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(79, 70, 229, 0.3) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.4);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15);
+}
+
+.nav-btn:hover:not(.active) {
+    background: rgba(30, 41, 59, 0.6);
+}
+
+/* Custom Range Slider Glow */
+input[type="range"]::-webkit-slider-thumb {
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    transition: transform 0.1s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* Data Table Styling */
+table th, table td {
+    white-space: nowrap;
+}
+
+/* Status Badges */
+.badge-pass {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-fail {
+    background: rgba(244, 63, 94, 0.15);
+    color: #fb7185;
+    border: 1px solid rgba(244, 63, 94, 0.3);
+}

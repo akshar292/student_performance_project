@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudentIQ • Academic Intelligence & Performance Prediction</title>
+    <meta name="description" content="AI-Powered Student Performance Analytics, Score Prediction, and SQL Insights Platform.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        dark: {
+                            bg: '#070a13',
+                            sidebar: '#0b0f19',
+                            card: '#0f172a',
+                            border: '#1e293b',
+                            input: '#1e293b'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome & Chart.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}?v=2.0">
+</head>
+<body class="bg-dark-bg text-slate-100 font-sans antialiased min-h-screen flex overflow-x-hidden">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-72 bg-dark-sidebar border-r border-dark-border flex flex-col fixed inset-y-0 z-30 transition-transform duration-300 md:translate-x-0 -translate-x-full">
+        <!-- Brand Header -->
+        <div class="p-6 border-b border-dark-border flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-cyan-400 flex items-center justify-center text-xl text-white shadow-lg shadow-brand-500/30">
+                    🎓
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-300 to-cyan-400 bg-clip-text text-transparent">
+                        StudentIQ
+                    </h1>
+                    <p class="text-xs text-slate-400 font-semibold tracking-wide">Academic Intelligence</p>
+                </div>
+            </div>
+            <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Navigation Menu -->
+        <div class="px-4 py-5 flex-1 overflow-y-auto space-y-6">
+            <div>
+                <p class="px-3 text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-2">Main Navigation</p>
+                <nav class="space-y-1">
+                    <button data-tab="dashboard" class="nav-btn active w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200">
+                        <i class="fa-solid fa-chart-pie text-brand-400 w-5"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button data-tab="analytics" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all duration-200">
+                        <i class="fa-solid fa-chart-column text-cyan-400 w-5"></i>
+                        <span>Analytics</span>
+                    </button>
+                    <button data-tab="prediction" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all duration-200">
+                        <i class="fa-solid fa-robot text-purple-400 w-5"></i>
+                        <span>AI Score Predictor</span>
+                    </button>
+                    <button data-tab="students" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all duration-200">
+                        <i class="fa-solid fa-users text-emerald-400 w-5"></i>
+                        <span>Student Directory</span>
+                    </button>
+                    <button data-tab="sql" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all duration-200">
+                        <i class="fa-solid fa-database text-amber-400 w-5"></i>
+                        <span>SQL Insights</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Global Filters Accordion -->
+            <div class="border-t border-dark-border pt-4">
+                <div class="flex items-center justify-between px-3 mb-3">
+                    <p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Global Filters</p>
+                    <button id="resetFiltersBtn" class="text-xs text-brand-400 hover:text-brand-300 font-semibold">Reset</button>
+                </div>
+
+                <div class="space-y-4 px-1">
+                    <!-- City Filter -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1.5">City Selection</label>
+                        <select id="filterCity" multiple class="w-full bg-slate-900 border border-dark-border rounded-lg text-xs text-slate-200 p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none max-h-24 overflow-y-auto">
+                            <!-- Populated dynamically -->
+                        </select>
+                        <span class="text-[10px] text-slate-500 mt-1 block">Hold Ctrl/Cmd to select multiple</span>
+                    </div>
+
+                    <!-- Gender Filter -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1.5">Gender</label>
+                        <div class="flex items-center gap-4 text-xs text-slate-300" id="filterGenderGroup">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Age Range -->
+                    <div>
+                        <div class="flex justify-between items-center text-xs mb-1">
+                            <span class="font-bold text-slate-300">Age Range</span>
+                            <span id="ageRangeVal" class="text-brand-400 font-semibold">18 - 24</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="filterMinAge" min="18" max="24" value="18" class="w-full accent-brand-500 h-1.5 bg-slate-800 rounded-lg">
+                            <input type="range" id="filterMaxAge" min="18" max="24" value="24" class="w-full accent-brand-500 h-1.5 bg-slate-800 rounded-lg">
+                        </div>
+                    </div>
+
+                    <!-- Result Status Filter -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1.5">Academic Status</label>
+                        <select id="filterResult" class="w-full bg-slate-900 border border-dark-border rounded-lg text-xs text-slate-200 p-2 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <option value="All">All Students</option>
+                            <option value="PASS Only">PASS Only</option>
+                            <option value="FAIL Only">FAIL Only</option>
+                        </select>
+                    </div>
+
+                    <button id="applyFiltersBtn" class="w-full py-2 px-3 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-brand-600/30 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-filter text-xs"></i>
+                        <span>Apply Filters</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Footer Status -->
+        <div class="p-4 border-t border-dark-border bg-slate-900/50">
+            <div id="dbStatusBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="dbStatusText">MySQL Connected</span>
+            </div>
+            <div class="mt-2 text-[11px] text-slate-500 text-center font-medium">
+                StudentIQ v2.0 • Flask & Tailwind
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 md:ml-72 min-h-screen flex flex-col">
+
+        <!-- HEADER BAR -->
+        <header class="h-20 border-b border-dark-border bg-dark-bg/80 backdrop-blur-md sticky top-0 z-20 px-6 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <button id="openSidebarBtn" class="md:hidden text-slate-400 hover:text-white p-2">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <div>
+                    <h2 id="pageTitle" class="text-xl font-extrabold text-white tracking-tight">Academic Performance Intelligence</h2>
+                    <p id="pageSubtitle" class="text-xs text-slate-400">Real-time overview & KPI metrics of student academic standing</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-bold">
+                    <i class="fa-solid fa-microchip text-indigo-400"></i>
+                    <span>ML Models Active</span>
+                </div>
+                <div class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 font-bold text-sm">
+                    AI
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT SECTIONS -->
+        <div class="p-6 flex-1 space-y-8 max-w-7xl mx-auto w-full">
+
+            <!-- TAB 1: DASHBOARD -->
+            <section id="tab-dashboard" class="tab-content block space-y-6">
+                <!-- KPI Cards Row -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <!-- KPI 1 -->
+                    <div class="glass-card p-5 border border-dark-border rounded-2xl relative overflow-hidden group hover:border-brand-500/50 transition-all duration-300">
+                        <div class="absolute -right-4 -bottom-4 text-slate-800/40 text-6xl font-black group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+                        <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Total Students</p>
+                        <h3 id="kpiTotal" class="text-3xl font-black text-white my-2">--</h3>
+                        <p class="text-xs text-cyan-400 font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-check-circle"></i> Active Cohort Records
+                        </p>
+                    </div>
+
+                    <!-- KPI 2 -->
+                    <div class="glass-card p-5 border border-dark-border rounded-2xl relative overflow-hidden group hover:border-purple-500/50 transition-all duration-300">
+                        <div class="absolute -right-4 -bottom-4 text-slate-800/40 text-6xl font-black group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-award"></i>
+                        </div>
+                        <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Average Final Score</p>
+                        <h3 id="kpiAvgScore" class="text-3xl font-black text-white my-2">--</h3>
+                        <p class="text-xs text-purple-400 font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-chart-line"></i> Overall Performance (0-100)
+                        </p>
+                    </div>
+
+                    <!-- KPI 3 -->
+                    <div class="glass-card p-5 border border-dark-border rounded-2xl relative overflow-hidden group hover:border-emerald-500/50 transition-all duration-300">
+                        <div class="absolute -right-4 -bottom-4 text-slate-800/40 text-6xl font-black group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Pass Rate %</p>
+                        <h3 id="kpiPassPct" class="text-3xl font-black text-emerald-400 my-2">--%</h3>
+                        <p id="kpiPassFailCounts" class="text-xs text-slate-400 font-semibold flex items-center gap-1">
+                            -- Passed | -- Failed
+                        </p>
+                    </div>
+
+                    <!-- KPI 4 -->
+                    <div class="glass-card p-5 border border-dark-border rounded-2xl relative overflow-hidden group hover:border-amber-500/50 transition-all duration-300">
+                        <div class="absolute -right-4 -bottom-4 text-slate-800/40 text-6xl font-black group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-city"></i>
+                        </div>
+                        <p class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Top City</p>
+                        <h3 id="kpiTopCity" class="text-3xl font-black text-amber-300 my-2">--</h3>
+                        <p id="kpiTopCityScore" class="text-xs text-amber-400 font-semibold flex items-center gap-1">
+                            Highest Academic Avg
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Dashboard Charts Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Doughnut Chart: Pass vs Fail -->
+                    <div class="glass-card p-6 border border-dark-border rounded-2xl flex flex-col justify-between">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-bold text-base text-slate-100 flex items-center gap-2">
+                                <i class="fa-solid fa-chart-pie text-brand-400"></i>
+                                Pass vs Fail Outcome
+                            </h4>
+                            <span class="text-xs text-slate-400">Target >= 40</span>
+                        </div>
+                        <div class="h-64 relative flex items-center justify-center">
+                            <canvas id="chartPassFail"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Bar Chart: City Performance -->
+                    <div class="glass-card p-6 border border-dark-border rounded-2xl lg:col-span-2 flex flex-col justify-between">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-bold text-base text-slate-100 flex items-center gap-2">
+                                <i class="fa-solid fa-location-dot text-cyan-400"></i>
+                                City Academic Score Averages
+                            </h4>
+                            <span class="text-xs text-slate-400">By Location</span>
+                        </div>
+                        <div class="h-64 relative">
+                            <canvas id="chartCityPerf"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: ANALYTICS -->
+            <section id="tab-analytics" class="tab-content hidden space-y-6">
+                <!-- Factors Scatter Plots -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-card p-6 border border-dark-border rounded-2xl">
+                        <h4 class="font-bold text-base text-slate-100 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-user-clock text-indigo-400"></i>
+                            Attendance (%) vs Final Score
+                        </h4>
+                        <div class="h-64 relative">
+                            <canvas id="chartAttendanceVsScore"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 border border-dark-border rounded-2xl">
+                        <h4 class="font-bold text-base text-slate-100 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-book-open text-purple-400"></i>
+                            Study Hours vs Final Score
+                        </h4>
+                        <div class="h-64 relative">
+                            <canvas id="chartStudyVsScore"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature Importances & Heatmap Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- ML Feature Importance -->
+                    <div class="glass-card p-6 border border-dark-border rounded-2xl">
+                        <h4 class="font-bold text-base text-slate-100 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-emerald-400"></i>
+                            Random Forest Feature Importances
+                        </h4>
+                        <div class="h-72 relative">
+                            <canvas id="chartFeatureImportances"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Correlation Table -->
+                    <div class="glass-card p-6 border border-dark-border rounded-2xl flex flex-col justify-between">
+                        <h4 class="font-bold text-base text-slate-100 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-table-cells text-amber-400"></i>
+                            Metric Correlation Matrix
+                        </h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left text-slate-300 border-collapse">
+                                <thead>
+                                    <tr id="corrHeader" class="border-b border-slate-700 bg-slate-900/50 text-slate-400 uppercase">
+                                        <!-- Populated JS -->
+                                    </tr>
+                                </thead>
+                                <tbody id="corrBody" class="divide-y divide-slate-800 font-mono">
+                                    <!-- Populated JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: AI PREDICTION -->
+            <section id="tab-prediction" class="tab-content hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Inputs Form -->
+                    <div class="glass-card p-6 border border-dark-border rounded-2xl lg:col-span-6 space-y-5">
+                        <div class="border-b border-dark-border pb-3">
+                            <h4 class="font-extrabold text-lg text-white flex items-center gap-2">
+                                <i class="fa-solid fa-calculator text-brand-400"></i>
+                                Student Parameters Input
+                            </h4>
+                            <p class="text-xs text-slate-400">Adjust the sliders to simulate student academic factors</p>
+                        </div>
+
+                        <form id="predictionForm" class="space-y-4">
+                            <!-- Attendance -->
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1">
+                                    <label class="text-slate-300">Attendance Percentage (%)</label>
+                                    <span id="valAttendance" class="text-brand-400">75%</span>
+                                </div>
+                                <input type="range" id="inputAttendance" min="0" max="100" value="75" step="1" class="w-full accent-brand-500 h-2 bg-slate-800 rounded-lg">
+                            </div>
+
+                            <!-- Study Hours -->
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1">
+                                    <label class="text-slate-300">Daily Study Hours (hrs)</label>
+                                    <span id="valStudyHours" class="text-cyan-400">4.0 hrs</span>
+                                </div>
+                                <input type="range" id="inputStudyHours" min="0" max="12" value="4.0" step="0.5" class="w-full accent-cyan-400 h-2 bg-slate-800 rounded-lg">
+                            </div>
+
+                            <!-- Assignment Score -->
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1">
+                                    <label class="text-slate-300">Assignment Score (0-100)</label>
+                                    <span id="valAssignment" class="text-purple-400">70</span>
+                                </div>
+                                <input type="range" id="inputAssignment" min="0" max="100" value="70" step="1" class="w-full accent-purple-400 h-2 bg-slate-800 rounded-lg">
+                            </div>
+
+                            <!-- Midterm Score -->
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1">
+                                    <label class="text-slate-300">Midterm Exam Score (0-100)</label>
+                                    <span id="valMidterm" class="text-emerald-400">65</span>
+                                </div>
+                                <input type="range" id="inputMidterm" min="0" max="100" value="65" step="1" class="w-full accent-emerald-400 h-2 bg-slate-800 rounded-lg">
+                            </div>
+
+                            <!-- Previous Score -->
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1">
+                                    <label class="text-slate-300">Previous Exam Score (0-100)</label>
+                                    <span id="valPrevious" class="text-amber-400">65</span>
+                                </div>
+                                <input type="range" id="inputPrevious" min="0" max="100" value="65" step="1" class="w-full accent-amber-400 h-2 bg-slate-800 rounded-lg">
+                            </div>
+
+                            <button type="submit" class="w-full py-3 bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white rounded-xl font-extrabold text-sm shadow-lg shadow-brand-500/30 transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span>Run AI Score & Pass/Fail Prediction</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Output Card -->
+                    <div class="glass-card p-6 border border-dark-border rounded-2xl lg:col-span-6 flex flex-col justify-between space-y-6">
+                        <div>
+                            <div class="border-b border-dark-border pb-3 flex items-center justify-between">
+                                <h4 class="font-extrabold text-lg text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-robot text-purple-400"></i>
+                                    AI Prediction Outcome
+                                </h4>
+                                <span id="predResultBadge" class="px-3 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                                    PASS
+                                </span>
+                            </div>
+
+                            <!-- Predicted Score Gauge / Box -->
+                            <div class="my-6 p-6 rounded-2xl bg-gradient-to-br from-slate-900 to-indigo-950/60 border border-indigo-500/30 text-center relative overflow-hidden">
+                                <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Predicted Final Grade Score</p>
+                                <div id="predScoreVal" class="text-6xl font-black bg-gradient-to-r from-indigo-300 via-white to-cyan-300 bg-clip-text text-transparent">
+                                    74.5
+                                </div>
+                                <p class="text-xs text-slate-400 mt-2 font-medium">Estimated out of 100 maximum score</p>
+                            </div>
+
+                            <!-- Pass/Fail Probability Breakdown -->
+                            <div class="space-y-3">
+                                <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Classification Probabilities</p>
+                                
+                                <div>
+                                    <div class="flex justify-between text-xs font-bold mb-1">
+                                        <span class="text-emerald-400">PASS Probability</span>
+                                        <span id="probPassVal" class="text-emerald-400">92.4%</span>
+                                    </div>
+                                    <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+                                        <div id="probPassBar" class="h-full bg-emerald-500 transition-all duration-500" style="width: 92.4%"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs font-bold mb-1">
+                                        <span class="text-rose-400">FAIL Probability</span>
+                                        <span id="probFailVal" class="text-rose-400">7.6%</span>
+                                    </div>
+                                    <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+                                        <div id="probFailBar" class="h-full bg-rose-500 transition-all duration-500" style="width: 7.6%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI Advice Box -->
+                        <div class="p-4 rounded-xl bg-brand-900/30 border border-brand-500/30 text-slate-200 space-y-2">
+                            <p class="text-xs font-extrabold text-brand-300 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-lightbulb"></i> Personalized AI Academic Recommendation
+                            </p>
+                            <p id="predAdviceText" class="text-xs leading-relaxed text-slate-300">
+                                Excellent profile! Student's study habits and attendance are strong across all tracked metrics.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: STUDENT DIRECTORY -->
+            <section id="tab-students" class="tab-content hidden space-y-6">
+                <div class="glass-card p-6 border border-dark-border rounded-2xl space-y-4">
+                    <!-- Search & Controls -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="relative w-full sm:w-80">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                            <input type="text" id="studentSearchInput" placeholder="Search student name or city..." class="w-full pl-9 pr-4 py-2 bg-slate-900 border border-dark-border rounded-xl text-xs text-slate-200 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                        <div class="text-xs text-slate-400 font-semibold">
+                            Showing <span id="studentTableCount" class="text-white font-bold">0</span> records
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="overflow-x-auto rounded-xl border border-dark-border">
+                        <table class="w-full text-xs text-left text-slate-300">
+                            <thead class="bg-slate-900/80 text-slate-400 font-bold uppercase tracking-wider border-b border-dark-border">
+                                <tr>
+                                    <th class="px-4 py-3">ID</th>
+                                    <th class="px-4 py-3">Name</th>
+                                    <th class="px-4 py-3">City</th>
+                                    <th class="px-4 py-3">Gender</th>
+                                    <th class="px-4 py-3">Age</th>
+                                    <th class="px-4 py-3">Attendance</th>
+                                    <th class="px-4 py-3">Study Hrs</th>
+                                    <th class="px-4 py-3">Final Score</th>
+                                    <th class="px-4 py-3">Result</th>
+                                    <th class="px-4 py-3 text-center">Scorecard</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTableBody" class="divide-y divide-slate-800">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: SQL INSIGHTS -->
+            <section id="tab-sql" class="tab-content hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Quick Queries Sidebar -->
+                    <div class="glass-card p-6 border border-dark-border rounded-2xl lg:col-span-4 space-y-4">
+                        <h4 class="font-bold text-base text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-database text-amber-400"></i>
+                            SQL Analytical Queries
+                        </h4>
+                        <p class="text-xs text-slate-400">Select an analytical query view to run against the database</p>
+                        <div class="space-y-2 pt-2">
+                            <button data-query="top_performers" class="sql-preset-btn w-full text-left p-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-dark-border text-xs font-semibold text-slate-200 transition-all flex items-center justify-between group">
+                                <span>🏆 Top 10 High Performers</span>
+                                <i class="fa-solid fa-chevron-right text-slate-500 group-hover:text-amber-400"></i>
+                            </button>
+                            <button data-query="at_risk" class="sql-preset-btn w-full text-left p-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-dark-border text-xs font-semibold text-slate-200 transition-all flex items-center justify-between group">
+                                <span>⚠️ At-Risk Students (Score < 40)</span>
+                                <i class="fa-solid fa-chevron-right text-slate-500 group-hover:text-amber-400"></i>
+                            </button>
+                            <button data-query="city_avg" class="sql-preset-btn w-full text-left p-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-dark-border text-xs font-semibold text-slate-200 transition-all flex items-center justify-between group">
+                                <span>🏙️ City Academic Breakdown</span>
+                                <i class="fa-solid fa-chevron-right text-slate-500 group-hover:text-amber-400"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Query Results Table -->
+                    <div class="glass-card p-6 border border-dark-border rounded-2xl lg:col-span-8 space-y-5">
+                        <div class="flex items-center justify-between border-b border-dark-border pb-3">
+                            <h5 id="sqlResultTitle" class="font-extrabold text-base text-white flex items-center gap-2">
+                                <i class="fa-solid fa-table text-amber-400"></i>
+                                Query Output Results
+                            </h5>
+                        </div>
+                        <div class="overflow-x-auto max-h-96 rounded-xl border border-dark-border">
+                            <table class="w-full text-xs text-left text-slate-300">
+                                <thead id="sqlResultHeader" class="bg-slate-900 text-slate-400 font-bold uppercase border-b border-dark-border">
+                                    <!-- JS -->
+                                </thead>
+                                <tbody id="sqlResultBody" class="divide-y divide-slate-800 font-mono">
+                                    <!-- JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- RADAR MODAL -->
+    <div id="radarModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-lg w-full p-6 border border-dark-border rounded-2xl space-y-4 relative animate-fade-in">
+            <button id="closeModalBtn" class="absolute right-4 top-4 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div>
+                <h3 id="modalStudentName" class="text-lg font-black text-white">Student Academic Radar</h3>
+                <p id="modalStudentDetails" class="text-xs text-slate-400">Performance profile metrics</p>
+            </div>
+            <div class="h-64 relative">
+                <canvas id="chartStudentRadar"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT -->
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=2.0"></script>
+</body>
+</html>
